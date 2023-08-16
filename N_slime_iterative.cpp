@@ -52,32 +52,43 @@ typedef tree<int, null_type, less<int>, rb_tree_tag, tree_order_statistics_node_
 
 const int mod = 1e9 + 7;
 const bool Multiple = false;
-const int inf = 1e15;
-int dp[405][405];
-vector<int> a(405);
-int cal(int i , int j) {
-	if (i == j) return 0 ;
-	if (dp[i][j] != -1) return dp[i][j];
-	int ans = 0ll;
-	for (int k = i ; k <= j ; k++) {
-		ans += a[k];
-	}
-	int ans2 = inf;
-	for (int k  = i ; k < j ; k++) {
-		ans2 = min(ans2, ans + cal(i, k) + cal(k + 1, j));
-	}
-	return dp[i][j] = ans2;
-}
+long long inf = 1e15 + 4;
+
 void solve() {
-	int n ;
+	long long n ;
 	cin >> n ;
+	vector<long long> a(n);
 	for (int i = 0 ; i < n; i++) {
 		cin >> a[i];
 	}
-	memset(dp, -1, sizeof(dp));
-	// dp[i][j] min cost to merge a from i to j
-	cout << cal(0, n - 1) << endl;
-
+	vector<vector<long long>> sum(n, vector<long long> (n, 0ll));
+	for (int i = 0 ; i < n ; i++) {
+		long long cur = 0 ;
+		for (int j = i ; j < n ; j++) {
+			cur += a[j];
+			sum[i][j] = cur;
+		}
+	}
+	vector<vector<long long>>  dp(n, vector<long long>(n, inf));
+	for (int i = 0 ; i < n ; i++) {
+		dp[i][i] = 0ll ;
+	}
+	for (int size = 1; size <= n ; size++) {
+		for (int left = 0 ; left < n ; left++) {
+			int right = left + size;
+			if (right < n ) {
+				for (int k = left ; k < right ; k++) {
+					dp[left][right] = min(dp[left][right], max(sum[left][right], sum[right][left]) + dp[left][k] + dp[k + 1][right]);
+				}
+			}
+		}
+	}
+	/*for (int i = 0 ; i < n ; i++) {
+		for (int j = 0 ; j < n ; j++) {
+			cout << i << " " << j << " " << dp[i][j] << endl;
+		}
+	}*/
+	cout << dp[0][n - 1] << endl;
 
 }
 signed  main()
